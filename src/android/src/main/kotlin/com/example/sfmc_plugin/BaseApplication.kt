@@ -12,13 +12,17 @@ import com.salesforce.marketingcloud.MarketingCloudSdk
 import com.salesforce.marketingcloud.UrlHandler
 import com.salesforce.marketingcloud.messages.iam.InAppMessage
 import com.salesforce.marketingcloud.messages.iam.InAppMessageManager
+import com.salesforce.marketingcloud.notifications.NotificationCustomizationOptions
+import com.salesforce.marketingcloud.notifications.NotificationManager
 import com.salesforce.marketingcloud.sfmcsdk.*
+import io.flutter.app.FlutterApplication
+import java.util.*
 
 const val LOG_TAG = "MCSDK"
 
-abstract class BaseApplication : Application(), UrlHandler {
+abstract class BaseApplication : FlutterApplication(), UrlHandler {
 
-    internal abstract val configBuilder: MarketingCloudConfig.Builder
+   abstract val configBuilder: MarketingCloudConfig.Builder
 
     override fun onCreate() {
         super.onCreate()
@@ -43,6 +47,7 @@ abstract class BaseApplication : Application(), UrlHandler {
         SFMCSdk.configure(applicationContext as Application, SFMCSdkModuleConfig.build {
             pushModuleConfig = configBuilder.build(applicationContext)
         }) { initStatus ->
+
             when (initStatus.status) {
                 InitializationStatus.SUCCESS -> {
                     Log.v(LOG_TAG, "Marketing Cloud initialization successful.")

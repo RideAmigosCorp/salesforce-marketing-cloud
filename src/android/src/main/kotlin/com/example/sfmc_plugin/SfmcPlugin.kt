@@ -62,7 +62,7 @@ class SfmcPlugin : FlutterPlugin, MethodCallHandler {
                         }
                     }
                 } catch (e: RuntimeException) {
-                    result.success(key)
+                    result.error(e.localizedMessage, e.message, e.message);
                 }
             }
             "addTag" -> {
