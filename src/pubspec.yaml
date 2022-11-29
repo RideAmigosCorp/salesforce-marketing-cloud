@@ -21,7 +21,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.example.sfmc_plugin
+        package: com.sfmc_plugin
         pluginClass: SfmcPlugin
       ios:
         pluginClass: SfmcPlugin

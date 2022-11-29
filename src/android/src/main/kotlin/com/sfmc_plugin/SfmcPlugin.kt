@@ -1,4 +1,4 @@
-package com.example.sfmc_plugin
+package com.sfmc_plugin
 
 import android.content.Context
 import androidx.annotation.NonNull
@@ -52,7 +52,7 @@ class SfmcPlugin : FlutterPlugin, MethodCallHandler {
                 result.success(isOperationSuccessful)
             }
             "getContactKey" -> {
-                var key: String? = null
+                var key: String?
                 try {
                     SFMCSdk.requestSdk { sdk ->
                         sdk.mp {
@@ -62,7 +62,7 @@ class SfmcPlugin : FlutterPlugin, MethodCallHandler {
                         }
                     }
                 } catch (e: RuntimeException) {
-                    result.error(e.localizedMessage, e.message, e.message);
+                    result.error("Failed to getContactKey", e.message, e.message);
                 }
             }
             "addTag" -> {

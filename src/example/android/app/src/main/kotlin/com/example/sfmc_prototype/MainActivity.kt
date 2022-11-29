@@ -1,6 +1,6 @@
-package com.sfmc.mobile.androiddev
+package com.example.sfmc_prototype
 
-import io.flutter.embedding.android.FlutterActivity
+import com.sfmc_plugin.BaseApplication
 
-class MainActivity: FlutterActivity() {
+class MainActivity: BaseApplication() {
 }
