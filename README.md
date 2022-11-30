@@ -8,48 +8,60 @@ Marketing Cloud MobilePush lets you create and send notifications to encourage u
 
 This SFMC Flutter Plugin includes:
 
-* Push Notifications
+- Push Notifications
 
-    Create a message using one of the templates in Marketing Cloud MobilePush or the Push Notification template in Content Builder or Journey Builder.
+  Create a message using one of the templates in Marketing Cloud MobilePush or the Push Notification template in Content Builder or Journey Builder.
 
-* In-App Messages
+- In-App Messages
 
-    In-app messages allow you to interact with your mobile app users while they use your mobile app, which is when they are most engaged. Trigger a message to show in your mobile app when a user opens the app on their device. While you can send this message to all of a contact’s devices, it only shows on the first device that opens the app. In-app messages can’t be created in MobilePush.
+  In-app messages allow you to interact with your mobile app users while they use your mobile app, which is when they are most engaged. Trigger a message to show in your mobile app when a user opens the app on their device. While you can send this message to all of a contact’s devices, it only shows on the first device that opens the app. In-app messages can’t be created in MobilePush.
 
-Learn more about SFMC Mobile Push SDK: 
-* [SFMC SDK Android](https://salesforce-marketingcloud.github.io/MarketingCloudSDK-Android/)
-* [SFMC SDK iOS](https://salesforce-marketingcloud.github.io/MarketingCloudSDK-iOS/)
+Learn more about SFMC Mobile Push SDK:
 
-# Let's get started #
+- [SFMC SDK Android](https://salesforce-marketingcloud.github.io/MarketingCloudSDK-Android/)
+- [SFMC SDK iOS](https://salesforce-marketingcloud.github.io/MarketingCloudSDK-iOS/)
+
+# Let's get started
 
 First of all you need to add sfmc_plugin in your project. In order to do that, follow [this guide](https://pub.dev/packages/sfmc_plugin/install).
 
 We suggest you to check [example](https://github.com/sefidgaran/salesforce-marketing-cloud/tree/main/src/example) source code.
 
-## Setup Android 
+## Setup Android
+
 Create an app in MobilePush. This process connects the device to the MobilePush app you created previously in [MobilePush](https://salesforce-marketingcloud.github.io/MarketingCloudSDK-Android/create-apps/create-apps-overview.html).
 
 Note: The Android SDK requires Android API 21 or greater and has dependencies on the Android Support v4 and Google Play Services libraries.
 
 ### Set up Firebase
+
 Follow the [Android Firebase setup](https://firebase.google.com/docs/android/setup) documentation.
 
 #### And your Firebase google-services.json to your android/app folder.
 
 #### Add google-services plugin to your android/app/build.gradle:
+
 ```java
   apply plugin: 'com.google.gms.google-services'
 ```
 
 #### Add google-services dependency to android/build.gradle:
+
 ```java
   dependencies {
     classpath 'com.google.gms:google-services:4.3.13'
   }
 ```
+
 ## Initialize SFMC SDK in Android
 
+Create a custom MainActivity.kt which is used instead of the default FlutterApplication (e.g.: https://stackoverflow.com/a/49084400/3410232).
+
+Then do not extend `FlutterApplication` but `BaseApplication` from `com.sfmc_plugin`.
+Now you can either provide your SFMC config values:
+
 Please update android/gradle.properties as example below:
+
 ```java
 MC_APP_ID="<YOUR_SFMC_APP_ID>"
 MC_ACCESS_TOKEN="<YOUR_SFMC_ACCESS_TOKEN>"
@@ -57,12 +69,22 @@ MC_SENDER_ID="<YOUR_FIREBASE_CLOUD_MESSAGING_SENDER_ID_FOR_SFMC>"
 MC_MID="<YOUR_SFMC_MID>"
 MC_SERVER_URL="<YOUR_SFMC_URL>"
 ```
-## Setup iOS 
 
-###  Provision for Push
+or to allow for more flexibility override the configBuilder
+
+```java
+override val configBuilder: MarketingCloudConfig.Builder
+        get() = MarketingCloudConfig.builder().apply { ... }
+```
+
+## Setup iOS
+
+### Provision for Push
+
 Please follow the [Provision for Push](https://salesforce-marketingcloud.github.io/MarketingCloudSDK-iOS/get-started/get-started-provision.html).
 
 ### Update info.plist
+
 Note: Please add UIBackgroundModes keys into your info.plist file as below:
 
 ```plist
@@ -74,9 +96,11 @@ Note: Please add UIBackgroundModes keys into your info.plist file as below:
 ```
 
 ### Setup `UNUserNotificationCenter` delegate
+
 Add the following lines to the `application` method in the AppDelegate.m/AppDelegate.swift file of your iOS project.
 
 Objective-C:
+
 ```objc
 if (@available(iOS 10.0, *)) {
   [UNUserNotificationCenter currentNotificationCenter].delegate = (id<UNUserNotificationCenterDelegate>) self;
@@ -84,14 +108,16 @@ if (@available(iOS 10.0, *)) {
 ```
 
 Swift:
+
 ```swift
 if #available(iOS 10.0, *) {
   UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
 }
 ```
+
 ## Use Flutter Plugin
 
-The first step is initializing the SFMC plugin with credential information (applies to iOS only, for Android please refer to setup Android section). 
+The first step is initializing the SFMC plugin with credential information (applies to iOS only, for Android please refer to setup Android section).
 [Learn more](https://salesforce-marketingcloud.github.io/MarketingCloudSDK-iOS/get-started/get-started-setupapps.html)
 
 ```dart
@@ -104,11 +130,11 @@ The first step is initializing the SFMC plugin with credential information (appl
             '<YOUR_SFMC_URL>',
         senderId: '<YOUR_FIREBASE_CLOUD_MESSAGING_SENDER_ID>',
 
-        /// Set delayRegistration on iOS only, 
+        /// Set delayRegistration on iOS only,
         /// delayRegistration on Android is by default true
         delayRegistration: true,
-        
-        /// Set analytics on iOS only, 
+
+        /// Set analytics on iOS only,
         /// analytics on Android is by default true
         analytics: true,
       );
@@ -129,7 +155,6 @@ await SfmcPlugin().setProfileAttribute("key", "value");
 
 await SfmcPlugin().clearProfileAttribute("key");
 ```
-
 
 ## Contributions
 

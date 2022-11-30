@@ -43,15 +43,9 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
                 sfmcURL: sfmcURL!,
                 delayRegistration: delayRegistration ?? true,
                 analytics: analytics ?? true,
-                onDone: { sfmcResult, message, code in
-                    if (sfmcResult) {
-                        isInitSuccessful = true
-                    } else {
-                        isInitSuccessful = false
-                    }
-                })
-            
-            result(isInitSuccessful)
+                result: result
+               )
+        
         }else if call.method == "setContactKey" {
             guard let args = call.arguments as? [String : Any] else {return}
             let cKey = args["contactKey"] as! String?
@@ -118,7 +112,7 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
         } else if call.method == "getPushToken" {
             result(nil)
         } else if call.method == "setPushToken" {
-            result()
+            result(nil)
         }
     }
     
@@ -157,7 +151,7 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
     
     // MobilePush SDK: REQUIRED IMPLEMENTATION
     
-    public func setupSFMC(appId: String, accessToken: String, mid: String, sfmcURL: String, delayRegistration: Bool, analytics: Bool, onDone: (_ result: Bool, _ message: String?, _ code: Int?) -> Void) {
+    public func setupSFMC(appId: String, accessToken: String, mid: String, sfmcURL: String, delayRegistration: Bool, analytics: Bool, result: @escaping FlutterResult) {
         
         // Enable logging for debugging early on. Debug level is not recommended for production apps, as significant data
         // about the MobilePush will be logged to the console.
@@ -181,13 +175,13 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
         
         let appEndpoint = URL(string: sfmcURL)!
         
-        // To override the Keycahin accessibility attribute
+        // To override the Keychain accessibility attribute
         SFMCSdk.setKeychainAccessibleAttribute(accessibleAttribute: kSecAttrAccessibleWhenUnlockedThisDeviceOnly)
         
         // To Override the Keychain Error to be considered fatal or not (Default value is true)
         SFMCSdk.setKeychainAccessErrorsAreFatal(errorsAreFatal: false)
         
-        // Use the Mobille Push Config Builder to configure the Mobile Push Module. This gives you the maximum flexibility in SDK configuration.
+        // Use the Mobile Push Config Builder to configure the Mobile Push Module. This gives you the maximum flexibility in SDK configuration.
         // The builder lets you configure the module parameters at runtime.
         let mobilePushConfiguration = PushConfigBuilder(appId: appId)
             .setAccessToken(accessToken)
@@ -199,24 +193,27 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
         
         var isInitSuccessful = false;
         
-        // Set the completion handler to take action when module initialization is completed. Result indicates if initialization was sucesfull or not.
-        let completionHandler: (OperationResult) -> () = { result in
-            if result == .success {
+        // Set the completion handler to take action when module initialization is completed. Result indicates if initialization was successful or not.
+        let completionHandler: (OperationResult) -> () = { initializeSuccess in
+            if initializeSuccess == .success {
                 // module is fully configured and is ready for use!
                 self.setupMobilePush()
-                isInitSuccessful = true
-            } else if result == .error {
+                result(true)
+            } else if initializeSuccess == .error {
                 // module failed to initialize, check logs for more details
-            } else if result == .cancelled {
-                // module initialization was cancelled (for example due to re-confirguration triggered before init was completed)
-            } else if result == .timeout {
+                result(false)
+            } else if initializeSuccess == .cancelled {
+                // module initialization was cancelled (for example due to re-configuration triggered before init was completed)
+                result(false)
+            } else if initializeSuccess == .timeout {
                 // module failed to initialize due to timeout, check logs for more details
+                result(false)
             }
         }
         
-        // Once you've created the mobile push configuration, intialize the SDK.
+        // Once you've created the mobile push configuration, initialize the SDK.
         SFMCSdk.initializeSdk(ConfigBuilder().setPush(config: mobilePushConfiguration, onCompletion: completionHandler).build())
-        onDone(isInitSuccessful, nil, nil);
+        
     }
     
     func setupMobilePush() {
