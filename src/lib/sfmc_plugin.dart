@@ -61,8 +61,10 @@ class SfmcPlugin {
   Future<bool?> setPushEnabled(bool? enabled) async =>
       SfmcPluginPlatform.instance.setPushEnabled(enabled);
 
-  /// ANDROID ONLY
-  /// Get the PushToken currently registered in the native SFMC sdk
+  ///Get the PushToken currently registered in the native SFMC sdk
+  /// [ANDROID] gets the FCM push token
+  ///
+  /// [iOS] gets the APNS token
   Future<String?> getPushToken() => SfmcPluginPlatform.instance.getPushToken();
 
   /// ANDROID ONLY
