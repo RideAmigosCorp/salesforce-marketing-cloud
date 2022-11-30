@@ -60,4 +60,13 @@ class SfmcPlugin {
   /// To Enable/Disable Push Notification
   Future<bool?> setPushEnabled(bool? enabled) async =>
       SfmcPluginPlatform.instance.setPushEnabled(enabled);
+
+  /// ANDROID ONLY
+  /// Get the PushToken currently registered in the native SFMC sdk
+  Future<String?> getPushToken() => SfmcPluginPlatform.instance.getPushToken();
+
+  /// ANDROID ONLY
+  /// Set the PushToken used for mobile push
+  Future<bool> setPushToken(String token) =>
+      SfmcPluginPlatform.instance.setPushToken(token);
 }

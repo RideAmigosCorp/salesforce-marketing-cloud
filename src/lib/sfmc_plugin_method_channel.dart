@@ -104,4 +104,19 @@ class MethodChannelSfmcPlugin extends SfmcPluginPlatform {
 
     return result;
   }
+
+  @override
+  Future<String?> getPushToken() async {
+    final String? result = await methodChannel.invokeMethod('getPushToken');
+
+    return result;
+  }
+
+  @override
+  Future<bool> setPushToken(String token) async {
+    final bool result =
+        await methodChannel.invokeMethod('setPushToken', {"token": token});
+
+    return result;
+  }
 }

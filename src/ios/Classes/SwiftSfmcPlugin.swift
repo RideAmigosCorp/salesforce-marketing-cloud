@@ -115,6 +115,10 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
                 return
             }
             result(setPushEnabled(isEnabled: isEnabled!))
+        } else if call.method == "getPushToken" {
+            result(nil)
+        } else if call.method == "setPushToken" {
+            result()
         }
     }
     

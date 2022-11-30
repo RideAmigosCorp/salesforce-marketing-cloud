@@ -56,8 +56,7 @@ class SfmcPlugin : FlutterPlugin, MethodCallHandler {
                 try {
                     SFMCSdk.requestSdk { sdk ->
                         sdk.mp {
-                            var contactKey = it.moduleIdentity.profileId
-                            key = contactKey
+                            key =  it.moduleIdentity.profileId
                             result.success(key)
                         }
                     }
@@ -152,6 +151,27 @@ class SfmcPlugin : FlutterPlugin, MethodCallHandler {
                     MarketingCloudSdk.requestSdk { sdk -> sdk.pushMessageManager.disablePush() }
                 }
                 result.success(true)
+            }
+            "getPushToken" -> {
+                var token: String?
+                try {
+                    SFMCSdk.requestSdk { sdk ->
+                        sdk.mp {
+                            token = it.pushMessageManager.pushToken
+                            result.success(token)
+                        }
+                    }
+                } catch (e: RuntimeException) {
+                    result.error("Failed to getPushToken", e.message, e.message);
+                }
+            }
+            "setPushToken" -> {
+                val token: String = call.argument<String>("token") as String
+                SFMCSdk.requestSdk { sdk -> 
+                    sdk.mp {
+                        it.pushMessageManager.setPushToken(token)
+                    }
+                }
             }
             else -> {
                 result.notImplemented()
