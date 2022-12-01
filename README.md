@@ -41,13 +41,13 @@ Follow the [Android Firebase setup](https://firebase.google.com/docs/android/set
 
 #### Add google-services plugin to your android/app/build.gradle:
 
-```java
+```gradle
   apply plugin: 'com.google.gms.google-services'
 ```
 
 #### Add google-services dependency to android/build.gradle:
 
-```java
+```gradle
   dependencies {
     classpath 'com.google.gms:google-services:4.3.13'
   }
@@ -62,7 +62,7 @@ Now you can either provide your SFMC config values:
 
 Please update android/gradle.properties as example below:
 
-```java
+```gradle
 MC_APP_ID="<YOUR_SFMC_APP_ID>"
 MC_ACCESS_TOKEN="<YOUR_SFMC_ACCESS_TOKEN>"
 MC_SENDER_ID="<YOUR_FIREBASE_CLOUD_MESSAGING_SENDER_ID_FOR_SFMC>"
@@ -155,6 +155,10 @@ await SfmcPlugin().setProfileAttribute("key", "value");
 
 await SfmcPlugin().clearProfileAttribute("key");
 ```
+
+### Other methods
+
+This plugin exposes some other methods such as `getPushToken` and `setPushToken`, which are helpful if you want to continue using other push providers as per the official documentation: https://salesforce-marketingcloud.github.io/MarketingCloudSDK-Android/trouble-shooting/multiple-push-sdks.html
 
 ## Contributions
 

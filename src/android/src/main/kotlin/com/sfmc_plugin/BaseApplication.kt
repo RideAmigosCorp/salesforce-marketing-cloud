@@ -21,7 +21,7 @@ import java.util.*
 const val LOG_TAG = "MCSDK"
 
 abstract class BaseApplication : FlutterApplication(), UrlHandler {
-    open val configBuilder: MarketingCloudConfig.Builder
+    open val configBuilder: MarketingCloudConfig.Builder?
         get() = MarketingCloudConfig.builder().apply {
            setApplicationId(BuildConfig.MC_APP_ID)
            setAccessToken(BuildConfig.MC_ACCESS_TOKEN)
@@ -58,7 +58,7 @@ abstract class BaseApplication : FlutterApplication(), UrlHandler {
 
     override fun onCreate() {
         super.onCreate()
-        initSDK()
+        initSfmcSdk()
     }
 
     override fun handleUrl(context: Context, url: String, urlSource: String): PendingIntent? {
@@ -70,14 +70,18 @@ abstract class BaseApplication : FlutterApplication(), UrlHandler {
         )
     }
 
-    private fun initSDK() {
+    public fun initSfmcSdk() {
         if (BuildConfig.DEBUG) {
             MarketingCloudSdk.setLogLevel(MCLogListener.VERBOSE)
             MarketingCloudSdk.setLogListener(MCLogListener.AndroidLogListener())
         }
 
+        if(configBuilder == null) {
+            return;
+        }
+
         SFMCSdk.configure(applicationContext as Application, SFMCSdkModuleConfig.build {
-            pushModuleConfig = configBuilder.build(applicationContext)
+            pushModuleConfig = configBuilder!!.build(applicationContext)
         }) { initStatus ->
 
             when (initStatus.status) {
