@@ -73,9 +73,12 @@ MC_SERVER_URL="<YOUR_SFMC_URL>"
 or to allow for more flexibility override the configBuilder
 
 ```java
-override val configBuilder: MarketingCloudConfig.Builder
+override val configBuilder: MarketingCloudConfig.Builder?
         get() = MarketingCloudConfig.builder().apply { ... }
 ```
+
+as you can see the configBuilder can also be `null`. This allows your application to not initialize the SDK if you do not want to. 
+See this thread for a very common use case: https://salesforce.stackexchange.com/questions/325537/changing-the-marketingcloudconfig-later-in-the-apps-lifecycle
 
 ## Setup iOS
 
