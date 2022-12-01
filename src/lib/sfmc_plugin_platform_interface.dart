@@ -72,4 +72,13 @@ abstract class SfmcPluginPlatform extends PlatformInterface {
   /// To Enable/Disable Push Notification
   Future<bool?> setPushEnabled(bool? enabled) =>
       _instance.setPushEnabled(enabled);
+
+  ///Get the PushToken currently registered in the native SFMC sdk
+  /// [ANDROID] gets the FCM push token
+  ///
+  /// [iOS] gets the APNS token
+  Future<String?> getPushToken() => _instance.getPushToken();
+
+  /// Set the PushToken used for mobile push
+  Future<void> setPushToken(String token) => _instance.setPushToken(token);
 }

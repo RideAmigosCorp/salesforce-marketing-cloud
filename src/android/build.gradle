@@ -1,4 +1,4 @@
-group 'com.example.sfmc_plugin'
+group 'com.sfmc_plugin'
 version '1.0-SNAPSHOT'
 
 buildscript {
@@ -55,5 +55,4 @@ android {
 dependencies {
     implementation ("com.salesforce.marketingcloud:marketingcloudsdk:$marketingcloudsdk_version")
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.google.firebase:firebase-messaging:20.1.2'
 }

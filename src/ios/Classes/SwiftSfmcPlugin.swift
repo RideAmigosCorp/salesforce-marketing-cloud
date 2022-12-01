@@ -43,15 +43,9 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
                 sfmcURL: sfmcURL!,
                 delayRegistration: delayRegistration ?? true,
                 analytics: analytics ?? true,
-                onDone: { sfmcResult, message, code in
-                    if (sfmcResult) {
-                        isInitSuccessful = true
-                    } else {
-                        isInitSuccessful = false
-                    }
-                })
-            
-            result(isInitSuccessful)
+                result: result
+               )
+        
         }else if call.method == "setContactKey" {
             guard let args = call.arguments as? [String : Any] else {return}
             let cKey = args["contactKey"] as! String?
@@ -115,6 +109,10 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
                 return
             }
             result(setPushEnabled(isEnabled: isEnabled!))
+        } else if call.method == "getPushToken" {
+            result(getPushToken())
+        } else if call.method == "setPushToken" {
+            result(nil)
         }
     }
     
@@ -151,9 +149,13 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
         return true
     }
     
+    func getPushToken()-> String?{
+        return SFMCSdk.mp.deviceToken()
+    }
+      
     // MobilePush SDK: REQUIRED IMPLEMENTATION
     
-    public func setupSFMC(appId: String, accessToken: String, mid: String, sfmcURL: String, delayRegistration: Bool, analytics: Bool, onDone: (_ result: Bool, _ message: String?, _ code: Int?) -> Void) {
+    public func setupSFMC(appId: String, accessToken: String, mid: String, sfmcURL: String, delayRegistration: Bool, analytics: Bool, result: @escaping FlutterResult) {
         
         // Enable logging for debugging early on. Debug level is not recommended for production apps, as significant data
         // about the MobilePush will be logged to the console.
@@ -177,13 +179,13 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
         
         let appEndpoint = URL(string: sfmcURL)!
         
-        // To override the Keycahin accessibility attribute
+        // To override the Keychain accessibility attribute
         SFMCSdk.setKeychainAccessibleAttribute(accessibleAttribute: kSecAttrAccessibleWhenUnlockedThisDeviceOnly)
         
         // To Override the Keychain Error to be considered fatal or not (Default value is true)
         SFMCSdk.setKeychainAccessErrorsAreFatal(errorsAreFatal: false)
         
-        // Use the Mobille Push Config Builder to configure the Mobile Push Module. This gives you the maximum flexibility in SDK configuration.
+        // Use the Mobile Push Config Builder to configure the Mobile Push Module. This gives you the maximum flexibility in SDK configuration.
         // The builder lets you configure the module parameters at runtime.
         let mobilePushConfiguration = PushConfigBuilder(appId: appId)
             .setAccessToken(accessToken)
@@ -195,24 +197,27 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
         
         var isInitSuccessful = false;
         
-        // Set the completion handler to take action when module initialization is completed. Result indicates if initialization was sucesfull or not.
-        let completionHandler: (OperationResult) -> () = { result in
-            if result == .success {
+        // Set the completion handler to take action when module initialization is completed. Result indicates if initialization was successful or not.
+        let completionHandler: (OperationResult) -> () = { initializeSuccess in
+            if initializeSuccess == .success {
                 // module is fully configured and is ready for use!
                 self.setupMobilePush()
-                isInitSuccessful = true
-            } else if result == .error {
+                result(true)
+            } else if initializeSuccess == .error {
                 // module failed to initialize, check logs for more details
-            } else if result == .cancelled {
-                // module initialization was cancelled (for example due to re-confirguration triggered before init was completed)
-            } else if result == .timeout {
+                result(false)
+            } else if initializeSuccess == .cancelled {
+                // module initialization was cancelled (for example due to re-configuration triggered before init was completed)
+                result(false)
+            } else if initializeSuccess == .timeout {
                 // module failed to initialize due to timeout, check logs for more details
+                result(false)
             }
         }
         
-        // Once you've created the mobile push configuration, intialize the SDK.
+        // Once you've created the mobile push configuration, initialize the SDK.
         SFMCSdk.initializeSdk(ConfigBuilder().setPush(config: mobilePushConfiguration, onCompletion: completionHandler).build())
-        onDone(isInitSuccessful, nil, nil);
+        
     }
     
     func setupMobilePush() {
@@ -288,7 +293,13 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
     }
     
     // MobilePush SDK: REQUIRED IMPLEMENTATION
-    /** This delegate method offers an opportunity for applications with the "remote-notification" background mode to fetch appropriate new data in response to an incoming remote notification. You should call the fetchCompletionHandler as soon as you're finished performing that operation, so the system can accurately estimate its power and data cost. This method will be invoked even if the application was launched or resumed because of the remote notification. The respective delegate methods will be invoked first. Note that this behavior is in contrast to application:didReceiveRemoteNotification:, which is not called in those cases, and which will not be invoked if this method is implemented. **/
+    /** This delegate method offers an opportunity for applications with the "remote-notification" background mode to fetch appropriate new data 
+     in response to an incoming remote notification. You should call the fetchCompletionHandler as soon as you're finished performing that operation, 
+     so the system can accurately estimate its power and data cost. This method will be invoked even if the application was launched or resumed,
+     because of the remote notification. 
+    The respective delegate methods will be invoked first. 
+    Note that this behavior is in contrast to application:didReceiveRemoteNotification:, 
+    which is not called in those cases, and which will not be invoked if this method is implemented. **/
     public func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) -> Bool{
         SFMCSdk.mp.setNotificationUserInfo(userInfo)
         
@@ -317,7 +328,8 @@ extension SwiftSfmcPlugin: URLHandlingDelegate {
 // MobilePush SDK: REQUIRED IMPLEMENTATION
 extension SwiftSfmcPlugin: UNUserNotificationCenterDelegate {
     
-    // The method will be called on the delegate when the user responded to the notification by opening the application, dismissing the notification or choosing a UNNotificationAction. The delegate must be set before the application returns from applicationDidFinishLaunching:.
+    // The method will be called on the delegate when the user responded to the notification by opening the application, 
+    // dismissing the notification or choosing a UNNotificationAction. The delegate must be set before the application returns from applicationDidFinishLaunching:.
     public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo = response.notification.request.content.userInfo
         if (userInfo["_sid"] as? String) == "SFMC" {
@@ -330,7 +342,10 @@ extension SwiftSfmcPlugin: UNUserNotificationCenterDelegate {
         }
     }
     
-    // The method will be called on the delegate only if the application is in the foreground. If the method is not implemented or the handler is not called in a timely manner then the notification will not be presented. The application can choose to have the notification presented as a sound, badge, alert and/or in the notification list. This decision should be based on whether the information in the notification is otherwise visible to the user.
+    // The method will be called on the delegate only if the application is in the foreground.
+    //  If the method is not implemented or the handler is not called in a timely manner then the notification will not be presented. 
+    // The application can choose to have the notification presented as a sound, badge, alert and/or in the notification list.
+    // This decision should be based on whether the information in the notification is otherwise visible to the user.
     public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         let userInfo = notification.request.content.userInfo
         // Check _sid to "SFMC" to make sure we only handle messages from SFMC
