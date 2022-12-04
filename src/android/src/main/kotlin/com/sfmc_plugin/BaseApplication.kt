@@ -70,7 +70,7 @@ abstract class BaseApplication : FlutterApplication(), UrlHandler {
         )
     }
 
-    public fun initSfmcSdk() {
+    private fun initSfmcSdk() {
         if (BuildConfig.DEBUG) {
             MarketingCloudSdk.setLogLevel(MCLogListener.VERBOSE)
             MarketingCloudSdk.setLogListener(MCLogListener.AndroidLogListener())
