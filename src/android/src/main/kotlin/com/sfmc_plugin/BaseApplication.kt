@@ -18,9 +18,11 @@ import com.salesforce.marketingcloud.sfmcsdk.*
 import io.flutter.app.FlutterApplication
 import java.util.*
 
+
 const val LOG_TAG = "MCSDK"
 
 abstract class BaseApplication : FlutterApplication(), UrlHandler {
+
     open val configBuilder: MarketingCloudConfig.Builder?
         get() = MarketingCloudConfig.builder().apply {
            setApplicationId(BuildConfig.MC_APP_ID)
