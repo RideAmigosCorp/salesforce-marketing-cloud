@@ -146,11 +146,16 @@ class SfmcPlugin : FlutterPlugin, MethodCallHandler {
             "setPushEnabled" -> {
                 val enablePush: Boolean = call.argument<Boolean>("isEnabled") as Boolean
                 if (enablePush) {
-                    MarketingCloudSdk.requestSdk { sdk -> sdk.pushMessageManager.enablePush() }
+                    MarketingCloudSdk.requestSdk { sdk -> 
+                        sdk.pushMessageManager.enablePush()
+                        result.success(true)
+                    }
                 } else {
-                    MarketingCloudSdk.requestSdk { sdk -> sdk.pushMessageManager.disablePush() }
+                    MarketingCloudSdk.requestSdk { sdk -> 
+                        sdk.pushMessageManager.disablePush()
+                        result.success(true)
+                    }
                 }
-                result.success(true)
             }
             "getPushToken" -> {
                 var token: String?
