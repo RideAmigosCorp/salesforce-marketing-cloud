@@ -69,6 +69,6 @@ class SfmcPlugin {
 
   /// ANDROID ONLY
   /// Set the PushToken used for mobile push
-  Future<void> setPushToken(String token) =>
+  Future<String?> setPushToken(String token) =>
       SfmcPluginPlatform.instance.setPushToken(token);
 }
