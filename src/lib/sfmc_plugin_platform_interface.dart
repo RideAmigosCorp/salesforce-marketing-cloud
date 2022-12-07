@@ -80,5 +80,5 @@ abstract class SfmcPluginPlatform extends PlatformInterface {
   Future<String?> getPushToken() => _instance.getPushToken();
 
   /// Set the PushToken used for mobile push
-  Future<void> setPushToken(String token) => _instance.setPushToken(token);
+  Future<String?> setPushToken(String token) => _instance.setPushToken(token);
 }

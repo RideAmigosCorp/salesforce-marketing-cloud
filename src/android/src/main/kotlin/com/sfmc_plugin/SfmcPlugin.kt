@@ -171,11 +171,16 @@ class SfmcPlugin : FlutterPlugin, MethodCallHandler {
                 }
             }
             "setPushToken" -> {
-                val token: String = call.argument<String>("token") as String
-                SFMCSdk.requestSdk { sdk -> 
-                    sdk.mp {
-                        it.pushMessageManager.setPushToken(token)
+                try{
+                    val token: String = call.argument<String>("token") as String
+                    SFMCSdk.requestSdk { sdk -> 
+                        sdk.mp {
+                            it.pushMessageManager.setPushToken(token)
+                            result.success(it.pushMessageManager.pushToken)
+                        }
                     }
+                } catch (e: RuntimeException) {
+                    result.error("Failed to set or get push token", e.message, e.message);
                 }
             }
             else -> {
