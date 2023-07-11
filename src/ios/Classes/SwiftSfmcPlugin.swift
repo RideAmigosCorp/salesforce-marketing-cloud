@@ -8,6 +8,7 @@ import Foundation
 import MarketingCloudSDK
 import SFMCSDK
 import UIKit
+import UserNotifications
 
 public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
   static var channel: FlutterMethodChannel?
@@ -384,7 +385,7 @@ extension SwiftSfmcPlugin: UNUserNotificationCenterDelegate {
     let userInfo = notification.request.content.userInfo
     // Check _sid to "SFMC" to make sure we only handle messages from SFMC
     if (userInfo["_sid"] as? String) == "SFMC" {
-      completionHandler(.alert)
+        completionHandler([.banner, .list, .sound])
     }
   }
 

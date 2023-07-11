@@ -1,0 +1,13 @@
+name: flutter_sfmc
+
+packages:
+  - packages/**
+
+scripts:
+  generate:pigeon:
+    run: melos exec -- "flutter pub run pigeon --input ./pigeons/messages.dart"
+    packageFilters:
+      fileExists: "pigeons/messages.dart"
+
+  format:
+    run: melos exec -- dart format -o write .
