@@ -170,7 +170,7 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
     if appId.contains("<your") || accessToken.contains("<your") || sfmcURL.contains("<your")
       || mid.contains("<your")
     {
-      fatalError(" Please add proper appID, accessToken, appEndPoint and mid")
+      fatalError("SFMC: Please add proper appID, accessToken, appEndPoint and mid")
     }
 
     let appEndpoint = URL(string: sfmcURL)!
@@ -286,7 +286,7 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
       SFMCSdk.mp.setNotificationUserInfo(notificationUserInfo_)
     } else {
       debugPrint(
-        "No notification UserInfo: - either it should be a direct launch or Notification userInfo is not available when launched from notification"
+        "SFMC: No notification UserInfo: - either it should be a direct launch or Notification userInfo is not available when launched from notification"
       )
     }
   }
@@ -320,9 +320,9 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
     fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
   ) -> Bool {
     if let string = userInfo["_sid"] as? String {
-      print("Optional string: \(string)")
+      print("SFMC: Optional string: \(string)")
     } else {
-      print("Optional string is nil or not a String")
+      print("SFMC: Optional string is nil or not a String")
     }
 
     if (userInfo["_sid"] as? String) == "SFMC" {
@@ -409,7 +409,7 @@ extension SwiftSfmcPlugin: InAppMessageEventDelegate {
      @return value reflecting application's behavior
      */
   public func sfmc_shouldShow(inAppMessage message: [AnyHashable: Any]) -> Bool {
-    print("message should show")
+    print("SFMC: message should show")
     return true
   }
 
@@ -420,7 +420,7 @@ extension SwiftSfmcPlugin: InAppMessageEventDelegate {
      */
   public func sfmc_didShow(inAppMessage message: [AnyHashable: Any]) {
     // message shown
-    print("message was shown")
+    print("SFMC: message was shown")
   }
 
   /**
@@ -430,6 +430,6 @@ extension SwiftSfmcPlugin: InAppMessageEventDelegate {
      */
   public func sfmc_didClose(inAppMessage message: [AnyHashable: Any]) {
     // message closed
-    print("message was closed")
+    print("SFMC: message was closed")
   }
 }
