@@ -22,7 +22,7 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     if call.method == "initialize" {
-        
+
       guard let args = call.arguments as? [String: Any] else { return }
       let appId = args["appId"] as? String
       let accessToken = args["accessToken"] as? String
@@ -170,13 +170,7 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
     if appId.contains("<your") || accessToken.contains("<your") || sfmcURL.contains("<your")
       || mid.contains("<your")
     {
-      fatalError(" Please add proper appID, accessToken, appEndPoint and mid")
-    }
-
-    //Throws fatal error when MarketingCloudSDK.bundle is not added to project bundle resources
-    guard Bundle.main.path(forResource: "MarketingCloudSDK", ofType: "bundle") != nil else {
-      print("The path could not be created.")
-      fatalError("Please add MarketingCloudSDK.bundle to the project's bundle resources!")
+      fatalError("SFMC: Please add proper appID, accessToken, appEndPoint and mid")
     }
 
     let appEndpoint = URL(string: sfmcURL)!
@@ -228,12 +222,16 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
     // In this example, the AppDelegate class adheres to the protocol (see below)
     // and handles URLs passed back from the SDK.
     // For more information, see https://salesforce-marketingcloud.github.io/MarketingCloudSDK-iOS/sdk-implementation/implementation-urlhandling.html
-    SFMCSdk.mp.setURLHandlingDelegate(self)
+    SFMCSdk.requestPushSdk { mp in
+      mp.setURLHandlingDelegate(self)
+    }
 
     // Set the MarketingCloudSDKEventDelegate to a class adhering to the protocol.
     // In this example, the AppDelegate class adheres to the protocol (see below)
     // and handles In-App Message delegate methods from the SDK.
-    SFMCSdk.mp.setEventDelegate(self)
+    SFMCSdk.requestPushSdk { mp in
+      mp.setEventDelegate(self)
+    }
 
     DispatchQueue.main.async {
       self.getNotifUserInfoFromAppDelegate()
@@ -262,7 +260,7 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
     }
   }
 
-    public func application(
+  public func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [AnyHashable: Any] = [:]
   ) -> Bool {
@@ -288,16 +286,18 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
       SFMCSdk.mp.setNotificationUserInfo(notificationUserInfo_)
     } else {
       debugPrint(
-        "No notification UserInfo: - either it should be a direct launch or Notification userInfo is not available when launched from notification"
+        "SFMC: No notification UserInfo: - either it should be a direct launch or Notification userInfo is not available when launched from notification"
       )
     }
   }
 
   // MobilePush SDK: REQUIRED IMPLEMENTATION
-    public func application(
+  public func application(
     _ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
   ) {
-    SFMCSdk.mp.setDeviceToken(deviceToken)
+    SFMCSdk.requestPushSdk { mp in
+      mp.setDeviceToken(deviceToken)
+    }
   }
 
   // MobilePush SDK: REQUIRED IMPLEMENTATION
@@ -319,20 +319,21 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
     _ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
     fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
   ) -> Bool {
-      if let string = userInfo["_sid"] as? String {
-          print("Optional string: \(string)")
-      } else {
-          print("Optional string is nil or not a String")
-      }
-      
-    if (userInfo["_sid"] as? String) == "SFMC" {
-      SFMCSdk.mp.setNotificationUserInfo(userInfo)
-
-      completionHandler(.newData)
-        return true
+    if let string = userInfo["_sid"] as? String {
+      print("SFMC: Optional string: \(string)")
+    } else {
+      print("SFMC: Optional string is nil or not a String")
     }
-      
-      return false
+
+    if (userInfo["_sid"] as? String) == "SFMC" {
+      SFMCSdk.requestPushSdk { mp in
+        mp.setNotificationUserInfo(userInfo)
+      }
+      completionHandler(.newData)
+      return true
+    }
+
+    return false
   }
 }
 
@@ -367,8 +368,9 @@ extension SwiftSfmcPlugin: UNUserNotificationCenterDelegate {
 
       // Required: tell the MarketingCloudSDK about the notification. This will collect MobilePush analytics
       // and process the notification on behalf of your application.
-      SFMCSdk.mp.setNotificationRequest(response.notification.request)
-
+      SFMCSdk.requestPushSdk { mp in
+        mp.setNotificationRequest(response.notification.request)
+      }
       completionHandler()
     }
   }
@@ -407,7 +409,7 @@ extension SwiftSfmcPlugin: InAppMessageEventDelegate {
      @return value reflecting application's behavior
      */
   public func sfmc_shouldShow(inAppMessage message: [AnyHashable: Any]) -> Bool {
-    print("message should show")
+    print("SFMC: message should show")
     return true
   }
 
@@ -418,7 +420,7 @@ extension SwiftSfmcPlugin: InAppMessageEventDelegate {
      */
   public func sfmc_didShow(inAppMessage message: [AnyHashable: Any]) {
     // message shown
-    print("message was shown")
+    print("SFMC: message was shown")
   }
 
   /**
@@ -428,6 +430,6 @@ extension SwiftSfmcPlugin: InAppMessageEventDelegate {
      */
   public func sfmc_didClose(inAppMessage message: [AnyHashable: Any]) {
     // message closed
-    print("message was closed")
+    print("SFMC: message was closed")
   }
 }

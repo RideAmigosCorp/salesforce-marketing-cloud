@@ -1,10 +1,10 @@
 name: sfmc_plugin
 description: Salesforce Marketing Cloud (SFMC) - MobilePush SDK for Flutter. Implement the MobilePush SDK for your iOS and Android applications in Flutter.
-version: 3.3.1
+version: 3.3.2
 homepage: https://github.com/sefidgaran/salesforce-marketing-cloud
 
 environment:
-  sdk: ">=2.17.6 <3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
   flutter: ">=2.5.0"
 
 dependencies:
