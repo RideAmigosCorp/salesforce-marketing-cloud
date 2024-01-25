@@ -224,16 +224,20 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
   }
 
   func setupMobilePush() {
-    // Set the MarketingCloudSDKURLHandlingDelegate to a class adhering to the protocol.
-    // In this example, the AppDelegate class adheres to the protocol (see below)
-    // and handles URLs passed back from the SDK.
-    // For more information, see https://salesforce-marketingcloud.github.io/MarketingCloudSDK-iOS/sdk-implementation/implementation-urlhandling.html
-    SFMCSdk.mp.setURLHandlingDelegate(self)
+      // Set the MarketingCloudSDKURLHandlingDelegate to a class adhering to the protocol.
+      // In this example, the AppDelegate class adheres to the protocol (see below)
+      // and handles URLs passed back from the SDK.
+      // For more information, see https://salesforce-marketingcloud.github.io/MarketingCloudSDK-iOS/sdk-implementation/implementation-urlhandling.html
+      SFMCSdk.requestPushSdk { mp in
+          mp.setURLHandlingDelegate(self)
+      }
 
     // Set the MarketingCloudSDKEventDelegate to a class adhering to the protocol.
     // In this example, the AppDelegate class adheres to the protocol (see below)
     // and handles In-App Message delegate methods from the SDK.
-    SFMCSdk.mp.setEventDelegate(self)
+      SFMCSdk.requestPushSdk { mp in
+          mp.setEventDelegate(self)
+      }
 
     DispatchQueue.main.async {
       self.getNotifUserInfoFromAppDelegate()
@@ -297,7 +301,9 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
     public func application(
     _ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
   ) {
-    SFMCSdk.mp.setDeviceToken(deviceToken)
+      SFMCSdk.requestPushSdk { mp in
+          mp.setDeviceToken(deviceToken)
+      }
   }
 
   // MobilePush SDK: REQUIRED IMPLEMENTATION
@@ -326,9 +332,10 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
       }
       
     if (userInfo["_sid"] as? String) == "SFMC" {
-      SFMCSdk.mp.setNotificationUserInfo(userInfo)
-
-      completionHandler(.newData)
+        SFMCSdk.requestPushSdk { mp in
+            mp.setNotificationUserInfo(userInfo)
+        }
+        completionHandler(.newData)
         return true
     }
       
@@ -365,11 +372,12 @@ extension SwiftSfmcPlugin: UNUserNotificationCenterDelegate {
     let userInfo = response.notification.request.content.userInfo
     if (userInfo["_sid"] as? String) == "SFMC" {
 
-      // Required: tell the MarketingCloudSDK about the notification. This will collect MobilePush analytics
-      // and process the notification on behalf of your application.
-      SFMCSdk.mp.setNotificationRequest(response.notification.request)
-
-      completionHandler()
+        // Required: tell the MarketingCloudSDK about the notification. This will collect MobilePush analytics
+        // and process the notification on behalf of your application.
+        SFMCSdk.requestPushSdk { mp in
+            mp.setNotificationRequest(response.notification.request)
+        }
+        completionHandler()
     }
   }
 
