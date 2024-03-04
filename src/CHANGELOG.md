@@ -1,3 +1,7 @@
+## 3.3.3
+
+- Update iOS SDK to 8.1.2
+
 ## 3.3.2
 
 - Update iOS SDK
