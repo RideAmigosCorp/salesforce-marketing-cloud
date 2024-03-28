@@ -1,3 +1,7 @@
+## 3.3.4
+
+- Add fix for broken installs
+
 ## 3.3.3
 
 - Update iOS SDK to 8.1.2

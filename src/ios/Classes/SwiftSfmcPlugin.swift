@@ -194,6 +194,7 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
 
     // Set the completion handler to take action when module initialization is completed. Result indicates if initialization was successful or not.
     let completionHandler: (OperationResult) -> Void = { initializeSuccess in
+      completionHandlerCalled = true
       if initializeSuccess == .success {
         // module is fully configured and is ready for use!
         self.setupMobilePush()
@@ -214,6 +215,34 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
     SFMCSdk.initializeSdk(
       ConfigBuilder().setPush(config: mobilePushConfiguration, onCompletion: completionHandler)
         .build())
+
+    // Set a timeout for the completion handler
+    // there a rare cases where the keychain is broken and we clean it here
+    // the sdk will then initialized correctly on the next start
+    DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+      debugPrint(
+        "SFMC: No notification UserInfo: - either it should be a direct launch or Notification userInfo is not available when launched from notification"
+      )
+
+      if !completionHandlerCalled {
+        // If the completion handler wasn't called within 5 seconds,
+        // we know SFMC is broken
+        // we clear the keychain for the app and finish the init call
+        let secItemClasses = [
+          kSecClassGenericPassword,
+          kSecClassInternetPassword,
+          kSecClassCertificate,
+          kSecClassKey,
+          kSecClassIdentity,
+        ]
+        for itemClass in secItemClasses {
+          let spec: NSDictionary = [kSecClass: itemClass]
+          SecItemDelete(spec)
+        }
+
+        result(false)
+      }
+    }
 
   }
 
