@@ -194,7 +194,6 @@ public class SwiftSfmcPlugin: NSObject, FlutterPlugin {
 
     // Set the completion handler to take action when module initialization is completed. Result indicates if initialization was successful or not.
     let completionHandler: (OperationResult) -> Void = { initializeSuccess in
-      completionHandlerCalled = true
       if initializeSuccess == .success {
         // module is fully configured and is ready for use!
         self.setupMobilePush()
