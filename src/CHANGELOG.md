@@ -1,3 +1,8 @@
+## 3.3.5
+
+- Update swift_version to 5.9
+- Update IOS SDK to 8.1.4
+
 ## 3.3.4
 
 - Add fix for broken installs
