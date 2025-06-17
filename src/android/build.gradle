@@ -42,6 +42,10 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
+    buildFeatures {
+        buildConfig true
+    }
+
     defaultConfig {
         minSdkVersion 23
         buildConfigField "String", "MC_APP_ID", project.hasProperty("MC_APP_ID") ? MC_APP_ID : '""' 
